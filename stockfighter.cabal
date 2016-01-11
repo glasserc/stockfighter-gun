@@ -20,6 +20,7 @@ executable stockfighter
   -- other-extensions:
   build-depends: aeson == 0.10.*
                , base >=4.7 && <4.8
+               , bytestring >= 0.10.4.0 && < 0.11
                , lens >= 4.13 && < 5
                , text >= 1.2 && < 1.3
                , wreq >= 0.4.1.0 && < 0.5
