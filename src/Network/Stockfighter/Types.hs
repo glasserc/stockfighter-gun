@@ -95,7 +95,7 @@ instance FromJSON OrderType where
 
 
 data Order = Order {
-    oSymbol :: Stock,
+    oStock :: Stock,
     oVenue :: Venue,
     oDirection :: Direction,
     oOriginalQuantity :: Int,
