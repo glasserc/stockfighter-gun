@@ -9,6 +9,8 @@ module Network.Stockfighter.Types (
     RequestOrder(..),
     -- FIXME: maybe don't export the constructor
     StockfighterEnvironment(..),
+    Stock,
+    Venue,
     ) where
 
 import Control.Applicative ((<$>), (<*>))
@@ -21,7 +23,12 @@ import Data.Text (Text)
 import qualified Network.Wreq.Session as S
 
 type ApiKey = ByteString
-
+-- | Stock ticker symbol representing a stock.
+-- The API sometimes calls this a "stock" and sometimes a "symbol".
+type Stock = Text
+-- | Symbol representing a venue.
+-- This is always called "venue".
+type Venue = Text
 type Money = Int  -- low 2 digits are cents
 
 -- | A handle on a Stockfighter instance.
@@ -32,8 +39,8 @@ data StockfighterEnvironment = SE {
 
 data RequestOrder = RequestOrder {
     roAccount :: Text,
-    roVenue :: Text,
-    roStock :: Text,
+    roVenue :: Venue,
+    roStock :: Stock,
     roPrice :: Maybe Money,  -- can be omitted for Market orders
     roQuantity :: Int,
     roDirection :: Direction,
@@ -88,8 +95,8 @@ instance FromJSON OrderType where
 
 
 data Order = Order {
-    oSymbol :: Text,
-    oVenue :: Text,
+    oSymbol :: Stock,
+    oVenue :: Venue,
     oDirection :: Direction,
     oOriginalQuantity :: Int,
     oQuantity :: Int,
