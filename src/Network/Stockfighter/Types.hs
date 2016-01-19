@@ -6,6 +6,7 @@ module Network.Stockfighter.Types (
     ApiKey,
     Direction(..),
     Envelope(..),
+    HeartbeatResponse(..),
     Order(..),
     OrderType(..),
     Quote(..),
@@ -43,6 +44,17 @@ data StockfighterEnvironment = SE {
     apiKey :: ApiKey,
     session :: S.Session
     }
+
+-- | Heartbeat API response.
+data HeartbeatResponse = HeartbeatResponse {
+    heartbeatOK :: Bool,
+    heartbeatError :: Text
+    } deriving Show
+
+instance FromJSON HeartbeatResponse where
+    parseJSON = withObject "HeartbeatResponse" $ \o ->
+        HeartbeatResponse <$> o .: "ok" <*> o .: "error"
+
 
 data RequestOrder = RequestOrder {
     roAccount :: Text,

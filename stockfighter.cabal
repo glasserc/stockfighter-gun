@@ -24,7 +24,6 @@ library
                , wreq >= 0.4.1.0 && < 0.5
   exposed-modules: Network.Stockfighter
                  , Network.Stockfighter.Requests
-                 , Network.Stockfighter.Responses
                  , Network.Stockfighter.Types
   hs-source-dirs:  src
 

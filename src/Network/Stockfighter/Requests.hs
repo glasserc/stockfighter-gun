@@ -10,8 +10,8 @@ import Control.Exception (throwIO)
 import Control.Lens ((&), (.~), (^.))
 import Data.Aeson (encode)
 import qualified Data.Text as T
-import Network.Stockfighter.Responses (HeartbeatResponse)
 import Network.Stockfighter.Types (Envelope(ESuccess, EFailure),
+    HeartbeatResponse,
     Order, Quote, Stock, Venue,
     RequestOrder(RequestOrder, roStock, roVenue),
     StockfighterEnvironment(SE, apiKey, session),
