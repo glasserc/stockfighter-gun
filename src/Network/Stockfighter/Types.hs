@@ -1,26 +1,32 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 module Network.Stockfighter.Types (
     ApiKey,
     Direction(..),
+    Envelope(..),
     Order(..),
     OrderType(..),
     Quote(..),
     RequestOrder(..),
     -- FIXME: maybe don't export the constructor
     StockfighterEnvironment(..),
+    StockfighterResponseException(..),
     Stock,
     Venue,
     ) where
 
 import Control.Applicative ((<$>), (<*>))
+import Control.Exception (Exception)
 import Control.Monad (unless)
-import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON), Value(String),
+import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON),
+                   Value(Object, String),
                    (.=), (.:), (.:?), object, withObject)
 import Data.ByteString (ByteString)
 import Data.Time.Clock (UTCTime)
 import Data.Text (Text)
+import Data.Typeable (Typeable)
 import qualified Network.Wreq.Session as S
 
 type ApiKey = ByteString
@@ -113,10 +119,7 @@ data Order = Order {
     } deriving (Show)
 
 instance FromJSON Order where
-    parseJSON = withObject "Order" $ \o -> do
-        isOK <- o .: "ok"
-        unless isOK $
-            fail $ "parsing order failed -- source was " ++ show o
+    parseJSON = withObject "Order" $ \o ->
         Order <$> o .: "symbol"
               <*> o .: "venue"
               <*> o .: "direction"
@@ -160,3 +163,22 @@ instance FromJSON Quote where
               <*> o .: "lastSize"
               <*> o .: "lastTrade"
               <*> o .: "quoteTime"
+
+
+data Envelope a = ESuccess a | EFailure Text
+                deriving Show
+
+instance FromJSON a => FromJSON (Envelope a) where
+    parseJSON = withObject "Envelope" $ \o -> do
+        isOK <- o .: "ok"
+        if isOK
+            then ESuccess <$> parseJSON (Object o)
+            else do
+            eError <- o .: "error"
+            return $ EFailure eError
+
+
+data StockfighterResponseException = StockfighterResponseException Text
+    deriving (Typeable, Show)
+
+instance Exception StockfighterResponseException

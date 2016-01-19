@@ -6,13 +6,16 @@ module Network.Stockfighter.Requests (
     newOrder
     ) where
 
+import Control.Exception (throwIO)
 import Control.Lens ((&), (.~), (^.))
 import Data.Aeson (encode)
 import qualified Data.Text as T
 import Network.Stockfighter.Responses (HeartbeatResponse)
-import Network.Stockfighter.Types (Order, Quote, Stock, Venue,
+import Network.Stockfighter.Types (Envelope(ESuccess, EFailure),
+    Order, Quote, Stock, Venue,
     RequestOrder(RequestOrder, roStock, roVenue),
-    StockfighterEnvironment(SE, apiKey, session))
+    StockfighterEnvironment(SE, apiKey, session),
+    StockfighterResponseException(StockfighterResponseException))
 import Network.Wreq (Options, asJSON, defaults, header, responseBody)
 import qualified Network.Wreq.Session as S
 
@@ -32,7 +35,7 @@ newOrder o@RequestOrder{roVenue, roStock} se@SE {session} = do
         url = stockURL roVenue roStock ++ "/orders"
 
     response <- S.postWith opts session url (encode o) >>= asJSON
-    return $ response ^. responseBody
+    checkEnvelope $ response ^. responseBody
 
 getQuote :: Venue -> Stock -> StockfighterEnvironment -> IO Quote
 getQuote venue stock se@SE {session} = do
@@ -40,7 +43,7 @@ getQuote venue stock se@SE {session} = do
         url = stockURL venue stock ++ "/quote"
 
     response <- S.getWith opts session url >>= asJSON
-    return $ response ^. responseBody
+    checkEnvelope $ response ^. responseBody
 
 -- | Base URL for requests affecting a stock on some venue.
 stockURL :: Venue -> Stock -> String
@@ -50,3 +53,9 @@ stockURL venue stock = concat [
     "/stocks/",
     T.unpack stock
     ]
+
+
+-- | Check that an envelope wraps a successful response, or throw an error.
+checkEnvelope :: Envelope a -> IO a
+checkEnvelope (ESuccess a) = return a
+checkEnvelope (EFailure s) = throwIO $ StockfighterResponseException s
