@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.Stockfighter.Requests (
     heartbeat,
+    getQuote,
     newOrder
     ) where
 
@@ -9,7 +10,7 @@ import Control.Lens ((&), (.~), (^.))
 import Data.Aeson (encode)
 import qualified Data.Text as T
 import Network.Stockfighter.Responses (HeartbeatResponse)
-import Network.Stockfighter.Types (Order,
+import Network.Stockfighter.Types (Order, Quote, Stock, Venue,
     RequestOrder(RequestOrder, roStock, roVenue),
     StockfighterEnvironment(SE, apiKey, session))
 import Network.Wreq (Options, asJSON, defaults, header, responseBody)
@@ -36,4 +37,17 @@ newOrder o@RequestOrder{roVenue, roStock} se@SE {session} = do
             "/orders"
             ]
     response <- S.postWith opts session url (encode o) >>= asJSON
+    return $ response ^. responseBody
+
+getQuote :: Venue -> Stock -> StockfighterEnvironment -> IO Quote
+getQuote venue stock se@SE {session} = do
+    let opts = stockfighterOptions se
+        url = concat [
+            "https://api.stockfighter.io/ob/api/venues/",
+            T.unpack venue,
+            "/stocks/",
+            T.unpack stock,
+            "/quote"
+            ]
+    response <- S.getWith opts session url >>= asJSON
     return $ response ^. responseBody

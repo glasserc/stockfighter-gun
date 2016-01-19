@@ -6,6 +6,7 @@ module Network.Stockfighter.Types (
     Direction(..),
     Order(..),
     OrderType(..),
+    Quote(..),
     RequestOrder(..),
     -- FIXME: maybe don't export the constructor
     StockfighterEnvironment(..),
@@ -16,7 +17,7 @@ module Network.Stockfighter.Types (
 import Control.Applicative ((<$>), (<*>))
 import Control.Monad (unless)
 import Data.Aeson (FromJSON(parseJSON), ToJSON(toJSON), Value(String),
-                   (.=), (.:), object, withObject)
+                   (.=), (.:), (.:?), object, withObject)
 import Data.ByteString (ByteString)
 import Data.Time.Clock (UTCTime)
 import Data.Text (Text)
@@ -128,3 +129,34 @@ instance FromJSON Order where
               <*> o .: "ts"
               <*> o .: "totalFilled"
               <*> o .: "open"
+
+
+data Quote = Quote {
+    qStock :: Stock,
+    qVenue :: Text,
+    qBid :: Maybe Money,
+    qAsk :: Maybe Money,
+    qBidSize :: Int,
+    qAskSize :: Int,
+    qBidDepth :: Int,
+    qAskDepth :: Int,
+    qLastPrice :: Money,
+    qLastQuantity :: Int,
+    qLastTimestamp :: UTCTime, -- ^ Timestamp of last trade
+    qTimestamp :: UTCTime  -- ^ Timestamp of last quote update
+    } deriving Show
+
+instance FromJSON Quote where
+    parseJSON = withObject "Quote" $ \o ->
+        Quote <$> o .: "symbol"
+              <*> o .: "venue"
+              <*> o .:? "bid"
+              <*> o .:? "ask"
+              <*> o .: "bidSize"
+              <*> o .: "askSize"
+              <*> o .: "bidDepth"
+              <*> o .: "askDepth"
+              <*> o .: "last"
+              <*> o .: "lastSize"
+              <*> o .: "lastTrade"
+              <*> o .: "quoteTime"
