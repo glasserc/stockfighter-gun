@@ -3,7 +3,7 @@
 
 name:                stockfighter
 version:             0.1.0.0
-synopsis:            tools and programs to beat stockfighter problems
+synopsis:            library for accessing the stockfighter API
 -- description:
 -- license:
 author:              Ethan Glasser-Camp
@@ -22,6 +22,12 @@ library
                , text >= 1.2 && < 1.3
                , time >= 1.4 && < 1.6
                , wreq >= 0.4.1.0 && < 0.5
+  exposed-modules: Network.Stockfighter
+                 , Network.Stockfighter.Requests
+                 , Network.Stockfighter.Responses
+                 , Network.Stockfighter.Types
+  hs-source-dirs:  src
+
 
 executable stockfighter
   main-is:  stockfighter.hs
