@@ -29,25 +29,24 @@ heartbeat se@SE{session} = do
 newOrder :: RequestOrder -> StockfighterEnvironment -> IO Order
 newOrder o@RequestOrder{roVenue, roStock} se@SE {session} = do
     let opts = stockfighterOptions se
-        url = concat [
-            "https://api.stockfighter.io/ob/api/venues/",
-            T.unpack roVenue,
-            "/stocks/",
-            T.unpack roStock,
-            "/orders"
-            ]
+        url = stockURL roVenue roStock ++ "/orders"
+
     response <- S.postWith opts session url (encode o) >>= asJSON
     return $ response ^. responseBody
 
 getQuote :: Venue -> Stock -> StockfighterEnvironment -> IO Quote
 getQuote venue stock se@SE {session} = do
     let opts = stockfighterOptions se
-        url = concat [
-            "https://api.stockfighter.io/ob/api/venues/",
-            T.unpack venue,
-            "/stocks/",
-            T.unpack stock,
-            "/quote"
-            ]
+        url = stockURL venue stock ++ "/quote"
+
     response <- S.getWith opts session url >>= asJSON
     return $ response ^. responseBody
+
+-- | Base URL for requests affecting a stock on some venue.
+stockURL :: Venue -> Stock -> String
+stockURL venue stock = concat [
+    "https://api.stockfighter.io/ob/api/venues/",
+    T.unpack venue,
+    "/stocks/",
+    T.unpack stock
+    ]
