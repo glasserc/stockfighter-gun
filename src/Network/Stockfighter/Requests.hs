@@ -17,7 +17,7 @@ import qualified Network.Wreq.Session as S
 
 stockfighterOptions :: StockfighterEnvironment -> Options
 stockfighterOptions SE {apiKey} =
-    defaults & header "X-Starfighter-Auth" .~ [apiKey]
+    defaults & header "X-Starfighter-Authorization" .~ [apiKey]
 
 heartbeat :: StockfighterEnvironment -> IO HeartbeatResponse
 heartbeat se@SE{session} = do
