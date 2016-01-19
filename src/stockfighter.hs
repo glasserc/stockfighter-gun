@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 import Control.Applicative ((<$>))
 import Data.Aeson (FromJSON(parseJSON), (.:), withObject)
+import Data.Text (strip)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Text.IO (hGetContents)
 import Network.Stockfighter (withStockfighterEnvironment)
@@ -21,4 +22,4 @@ main = do
 getApiKey :: IO ApiKey
 getApiKey = do
     home <- getEnv "HOME"
-    encodeUtf8 <$> withFile (home ++ "/.stockfighter") ReadMode hGetContents
+    encodeUtf8 . strip <$> withFile (home ++ "/.stockfighter") ReadMode hGetContents
