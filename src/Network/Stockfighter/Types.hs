@@ -7,7 +7,9 @@ module Network.Stockfighter.Types (
     Direction(..),
     Envelope(..),
     HeartbeatResponse(..),
+    Money,
     Order(..),
+    OrderId,
     OrderType(..),
     Quote(..),
     RequestOrder(..),
@@ -112,6 +114,7 @@ instance FromJSON OrderType where
     parseJSON (String "immediate-or-cancel") = return ImmediateOrCancel
     parseJSON x = fail $ "couldn't parse OrderType from " ++ show x
 
+type OrderId = Integer
 
 data Order = Order {
     oStock :: Stock,
@@ -121,7 +124,7 @@ data Order = Order {
     oQuantity :: Int,
     oPrice :: Money,
     oOrderType :: OrderType,
-    oId :: Integer,
+    oId :: OrderId,
     oAccount :: Text,
     oTimestamp :: UTCTime,
     -- FIXME:
