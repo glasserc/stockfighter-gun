@@ -25,6 +25,7 @@ library
   exposed-modules: Network.Stockfighter
                  , Network.Stockfighter.Requests
                  , Network.Stockfighter.Types
+                 , Network.Stockfighter.Lens
   hs-source-dirs:  src
 
 
