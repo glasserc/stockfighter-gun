@@ -121,7 +121,7 @@ data Order = Order {
     oVenue :: Venue,
     oDirection :: Direction,
     oOriginalQuantity :: Int,
-    oQuantity :: Int,
+    oQuantity :: Int,   -- quantity remaining in the order
     oPrice :: Money,
     oOrderType :: OrderType,
     oId :: OrderId,
@@ -130,6 +130,7 @@ data Order = Order {
     -- FIXME:
     --oFills
     oTotalFilled :: Int, -- presumably this matches oFills
+    -- presumably oTotalFilled + oQuantity = oOriginalQuantity
     oOpen :: Bool
     } deriving (Show)
 
