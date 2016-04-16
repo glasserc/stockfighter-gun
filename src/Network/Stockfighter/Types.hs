@@ -6,6 +6,7 @@ module Network.Stockfighter.Types (
     ApiKey,
     Direction(..),
     Envelope(..),
+    Fill(..),
     HeartbeatResponse(..),
     Money,
     Order(..),
@@ -116,6 +117,18 @@ instance FromJSON OrderType where
 
 type OrderId = Integer
 
+data Fill = Fill {
+    fPrice :: Money,
+    fQuantity :: Int,
+    fTimestamp :: UTCTime
+    } deriving (Eq, Show)
+
+instance FromJSON Fill where
+    parseJSON = withObject "Fill" $ \o ->
+        Fill <$> o .: "price"
+             <*> o .: "qty"
+             <*> o .: "ts"
+
 data Order = Order {
     oStock :: Stock,
     oVenue :: Venue,
@@ -127,8 +140,7 @@ data Order = Order {
     oId :: OrderId,
     oAccount :: Text,
     oTimestamp :: UTCTime,
-    -- FIXME:
-    --oFills
+    oFills :: [Fill],
     oTotalFilled :: Int, -- presumably this matches oFills
     -- presumably oTotalFilled + oQuantity = oOriginalQuantity
     oOpen :: Bool
@@ -146,6 +158,7 @@ instance FromJSON Order where
               <*> o .: "id"
               <*> o .: "account"
               <*> o .: "ts"
+              <*> o .: "fills"
               <*> o .: "totalFilled"
               <*> o .: "open"
 
